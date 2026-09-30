@@ -44,11 +44,11 @@ python3 -m py_compile server.py
 node test-core.js
 ```
 
-Fourteen deterministic tests cover numbered notes, genuine quotes, invented IDs, fabricated/too-short quotes, mixed citations, tool configuration, key exclusion untrusted-note handling in the prompt and malformed evidence/coaching payloads. UI checks were performed locally in headless Chrome at desktop and mobile widths. Live provider connectivity is separately documented in the submission; offline checks are not evidence that speech is working.
+Fourteen deterministic tests cover numbered notes, genuine quotes, invented IDs, fabricated/too-short quotes, mixed citations, tool configuration, key exclusion untrusted-note handling in the prompt and malformed evidence/coaching payloads. UI checks were performed locally in headless Chrome at desktop and mobile widths. Live provider connectivity is documented in the Live validation section below; offline checks are not evidence that speech is working.
 
 ## Deploy
 
-The deployment packages the frontend into `server.py` so the private repository is self-contained. The development archive keeps separate frontend files for editing. `render.yaml` declares a free Python web service. Supply the AssemblyAI key as a hosting secret. Startup: `python3 server.py`; health: `/health`. Do not commit `.env`.
+The deployment packages the frontend into `server.py` so the repository is self-contained. The development archive keeps separate frontend files for editing. `render.yaml` declares a free Python web service. Supply the AssemblyAI key as a hosting secret. Startup: `python3 server.py`; health: `/health`. Do not commit `.env`.
 
 ## Attribution
 
