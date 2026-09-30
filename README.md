@@ -9,8 +9,8 @@ Paste short notes, answer aloud, hear a follow-up and receive feedback linked to
 Python 3.9+ and Chrome/Edge. No Python packages required.
 
 ```sh
-cp .env.example .env
-# Set ASSEMBLYAI_API_KEY in .env, never in the browser or repository.
+# Create .env with ASSEMBLYAI_API_KEY=your_key, or use a hosting secret.
+# Never put the key in the browser or repository.
 python3 server.py
 ```
 
@@ -40,15 +40,15 @@ No separate LLM/TTS keys, GPU, database or paid phone service required.
 ## Tests
 
 ```sh
+python3 -m py_compile server.py
 node test-core.js
-python3 -m py_compile server.py lib.py
 ```
 
-Nine deterministic tests cover numbered notes, genuine quotes, invented IDs, fabricated/too-short quotes, mixed citations, tool configuration, key exclusion and untrusted-note handling in the prompt. UI checks were performed locally in headless Chrome at desktop and mobile widths. Live provider connectivity is separately documented in the submission; offline checks are not evidence that speech is working.
+Eleven deterministic tests cover numbered notes, genuine quotes, invented IDs, fabricated/too-short quotes, mixed citations, tool configuration, key exclusion untrusted-note handling in the prompt and malformed evidence payloads. UI checks were performed locally in headless Chrome at desktop and mobile widths. Live provider connectivity is separately documented in the submission; offline checks are not evidence that speech is working.
 
 ## Deploy
 
-`render.yaml` declares a free Python web service. Supply the AssemblyAI key as a hosting secret. Startup: `python3 server.py`; health: `/health`. Do not commit `.env`.
+The deployment packages the frontend into `server.py` so the private repository is self-contained. The development archive keeps separate frontend files for editing. `render.yaml` declares a free Python web service. Supply the AssemblyAI key as a hosting secret. Startup: `python3 server.py`; health: `/health`. Do not commit `.env`.
 
 ## Attribution
 
