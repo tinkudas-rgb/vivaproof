@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: vivaproof
+    runtime: python
+    plan: free
+    buildCommand: echo "No dependencies required"
+    startCommand: python3 server.py
+    healthCheckPath: /health
+    envVars:
+      - key: ASSEMBLYAI_API_KEY
+        sync: false
+      - key: MAX_SESSIONS_PER_HOUR
+        value: 20
