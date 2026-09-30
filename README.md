@@ -22,7 +22,7 @@ Open http://localhost:3000. Without an API key, the explicitly labeled **Sample 
 2. Browser streams PCM16 24 kHz microphone audio over AssemblyAI WebSocket.
 3. Per-session configuration contains numbered notes and an examiner prompt.
 4. AssemblyAI handles speech recognition, managed conversational reasoning, turn detection, interruptions and speech output.
-5. The agent calls `render_feedback`. The browser verifies exact quotes locally and returns its result only after `reply.done`, preventing mid-turn races. Interrupted pending results are discarded.
+5. The agent calls `save_answer`. A simple text payload carries Strength, Gap, Retry and an exact source quote. The browser parses these labels, verifies full source-note text locally and returns its result only after `reply.done`, preventing mid-turn races. Interrupted pending results are discarded.
 6. The learner reviews the card, retries and can download the session locally.
 
 No separate LLM/TTS keys, GPU, database or paid phone service required.
@@ -44,7 +44,7 @@ python3 -m py_compile server.py
 node test-core.js
 ```
 
-Eleven deterministic tests cover numbered notes, genuine quotes, invented IDs, fabricated/too-short quotes, mixed citations, tool configuration, key exclusion untrusted-note handling in the prompt and malformed evidence payloads. UI checks were performed locally in headless Chrome at desktop and mobile widths. Live provider connectivity is separately documented in the submission; offline checks are not evidence that speech is working.
+Fourteen deterministic tests cover numbered notes, genuine quotes, invented IDs, fabricated/too-short quotes, mixed citations, tool configuration, key exclusion untrusted-note handling in the prompt and malformed evidence/coaching payloads. UI checks were performed locally in headless Chrome at desktop and mobile widths. Live provider connectivity is separately documented in the submission; offline checks are not evidence that speech is working.
 
 ## Deploy
 
@@ -58,3 +58,7 @@ Documentation:
 - https://www.assemblyai.com/docs/voice-agents/voice-agent-api
 - https://www.assemblyai.com/docs/voice-agents/voice-agent-api/browser-integration
 - https://www.assemblyai.com/docs/voice-agents/voice-agent-api/tools/client-side-tools
+
+## Live validation
+
+Live demo: https://vivaproof.onrender.com/ . A deployed desktop Chrome test on September 30, 2026 verified actual examiner audio, one complete synthetic-student answer, a client tool call, a displayed coaching card with an exact verified N3 note quote, spoken follow-up and clean teardown. No JavaScript errors. This is one synthetic-microphone turn, not a full browser or device matrix. Adaptive turn detection replaced explicit silence thresholds after initial tests split sentences. The simple text tool replaced a richer schema that produced empty replies or raw tool text. Some spoken coaching remains longer than desired. Unsupported or unstructured coaching is rejected instead of displayed as evidence.
