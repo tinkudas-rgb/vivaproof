@@ -6,11 +6,12 @@ Paste short notes, answer aloud, hear a follow-up and receive feedback linked to
 
 ## Run
 
-Python 3.9+ and Chrome/Edge. No Python packages required.
+Python 3.10+ and Chrome/Edge. Backend: FastAPI and Uvicorn. Frontend: vanilla JavaScript.
 
 ```sh
 # Create .env with ASSEMBLYAI_API_KEY=your_key, or use a hosting secret.
 # Never put the key in the browser or repository.
+pip install -r requirements.txt
 python3 server.py
 ```
 
@@ -18,14 +19,14 @@ Open http://localhost:3000. Without an API key, the explicitly labeled **Sample 
 
 ## AssemblyAI architecture
 
-1. Python server mints a short-lived single-use Voice Agent API token.
-2. Browser streams PCM16 24 kHz microphone audio over AssemblyAI WebSocket.
+1. FastAPI mints a short-lived single-use Voice Agent API token server-side.
+2. Browser streams PCM16 24 kHz microphone audio through the FastAPI `/voice` WebSocket proxy to AssemblyAI. Speech-to-text, spoken replies and feedback events return through the same proxy. The provider key and token never reach the browser.
 3. Per-session configuration contains numbered notes and an examiner prompt.
 4. AssemblyAI handles speech recognition, managed conversational reasoning, turn detection, interruptions and speech output.
 5. The agent calls `save_answer`. A simple text payload carries Strength, Gap, Retry and an exact source quote. The browser parses these labels, verifies full source-note text locally and returns its result only after `reply.done`, preventing mid-turn races. Interrupted pending results are discarded.
 6. The learner reviews the card, retries and can download the session locally.
 
-No separate LLM/TTS keys, GPU, database or paid phone service required.
+No separate LLM/TTS keys, GPU, database or paid phone service required. FastAPI relays audio in memory only; it does not store notes, audio or transcripts. Same-origin checks, a per-hour session cap and a five-minute provider session cap limit access.
 
 ## Scope and safety
 
@@ -48,7 +49,8 @@ Fourteen deterministic tests cover numbered notes, genuine quotes, invented IDs,
 
 ## Deploy
 
-The deployment packages the frontend into `server.py` so the repository is self-contained. The development archive keeps separate frontend files for editing. `render.yaml` declares a free Python web service. Supply the AssemblyAI key as a hosting secret. Startup: `python3 server.py`; health: `/health`. Do not commit `.env`.
+The deployment packages the frontend into `server.py` so the repository is self-contained. The development archive keeps separate frontend files for editing. `render.yaml` declares a free Python web service. Supply the AssemblyAI key as a hosting secret. Startup: `pip install -r requirements.txt
+python3 server.py`; health: `/health`. Do not commit `.env`.
 
 ## Attribution
 
