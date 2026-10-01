@@ -84,3 +84,29 @@ Code map: `core.js` has `answerTimer`, `timeoutInstructions` and `historyStore`.
 The `ASSETS` in `server.py` contain the UI and `app.js` audio/history wiring.
 `test-features.js` tests deadlines, Off mode, local saves, reloads and storage failures.
 Run `node test-core.js && node test-features.js && python3 test_backend.py`.
+
+## Study notes, PDF import and visible model answers
+
+Notes accept up to 48,000 characters and 300 numbered source chunks. This replaces
+12,000 characters in the textarea and the old silent 60-line cut-off. Long paragraphs
+are split into 1,000-character source chunks; no accepted text is silently dropped.
+The backend bounds system prompts at 64,000 characters, including note IDs and coaching
+instructions. Audio frames remain capped at 1 MiB. Hourly and five-minute session caps
+are unchanged. Bigger notes may be slower; choose relevant chapters for each session.
+
+Import a text PDF up to 10 MB and 100 pages. PDF.js 5.5.207 runs in the browser and
+loads on demand from jsDelivr. The PDF itself is not sent to this app's server or the
+CDN. Extracted text replaces the notes only after extraction succeeds and you confirm
+replacement. Check the text before starting; columns and tables may read out of order.
+Scanned/image-only PDFs need OCR first. Password-protected files need an unlocked copy.
+This is text extraction, not OCR. Starting a viva still sends extracted notes, audio
+and transcripts to AssemblyAI under its policies, just like pasted notes.
+
+A timed-out answer appears in a separate Model answer block. It shows the examiner's
+spoken model-answer text and is labeled AI-generated; check it against your notes.
+Visible model answers are saved with local history and downloads. Exact-quote feedback
+cards remain a separate strict check. Neither notes nor PDFs are stored on the server.
+
+Code map: `prepareNotes`, `pdfFileCheck`, `pdfPageText`, and `modelAnswerText` in
+`core.js`; `showModelAnswer` and the PDF file-input handler in embedded `app.js`;
+`validate_browser_message` in `server.py` checks the maximum study context.
