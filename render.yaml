@@ -3,7 +3,7 @@ services:
     name: vivaproof
     runtime: python
     plan: free
-    buildCommand: echo "No dependencies required"
+    buildCommand: pip install -r requirements.txt
     startCommand: python3 server.py
     healthCheckPath: /health
     envVars:
