@@ -8,6 +8,11 @@ async def main():
    await page.goto('http://localhost:3000/')
    result=await page.evaluate('''()=>{const sent=[];ws={readyState:1,send:s=>sent.push(JSON.parse(s))};basePrompt='base';answerTimer=VivaCore.answerTimer(15,expireAnswer);expireAnswer();const muted=answerMuted;replyActive=true;lastEvent='reply.started';finishTimeout();const held=answerMuted;replyActive=false;lastEvent='reply.done';playbackDrained=true;finishTimeout();const modelRequested=timeoutModelRequested;replyActive=false;lastEvent='reply.done';playbackDrained=true;finishTimeout();clearTimeout(timeoutFallback);ws=null;return {sent,muted,held,reopened:!answerMuted};}''')
    assert result['muted'] and result['held'] and result['reopened'];assert len(result['sent'])==3;assert 'expired' in result['sent'][0]['session']['system_prompt'];assert result['sent'][2]['session']['system_prompt']=='base';assert result['sent'][1]['type']=='reply.create';assert 'model answer' in result['sent'][1]['instructions'];assert not errors
-   print(json.dumps({'mock_timeout':'pass','errors':errors}));await b.close()
+   await page.evaluate("sessionRecord={id:'model-test',date:new Date().toISOString(),mode:'live session',notes:[],transcript:[],feedback:[]};showModelAnswer('Time is up. Model answer: Check the trusted source.')")
+   assert await page.locator('#model-panel').is_visible()
+   assert 'Check the trusted source' in await page.locator('#model-answer').inner_text()
+   await page.reload();await page.locator('.history-row button').first.click()
+   assert 'Check the trusted source' in await page.locator('#history-detail').inner_text()
+   print(json.dumps({'mock_timeout':'pass','model_answer_history':'pass','errors':errors}));await b.close()
  finally:proc.terminate();proc.wait()
 asyncio.run(main())
