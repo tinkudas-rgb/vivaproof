@@ -64,3 +64,23 @@ Documentation:
 ## Live validation
 
 Live demo: https://vivaproof.onrender.com/ . A deployed desktop Chrome test on September 30, 2026 verified actual examiner audio, one complete synthetic-student answer, a client tool call, a displayed coaching card with an exact verified N3 note quote, spoken follow-up and clean teardown. No JavaScript errors. This is one synthetic-microphone turn, not a full browser or device matrix. Adaptive turn detection replaced explicit silence thresholds after initial tests split sentences. The simple text tool replaced a richer schema that produced empty replies or raw tool text. Some spoken coaching remains longer than desired. Unsupported or unstructured coaching is rejected instead of displayed as evidence.
+
+## Answer timer and session history
+
+Select an answer time before starting: Off, 10, 15 (default), 30 or 60 seconds.
+The timer starts when student speech begins, not while the examiner is talking.
+At the limit the browser replaces further microphone frames with silence. The examiner
+uses the notes to give a model answer and a Strength / Gap / Retry coaching card.
+The microphone opens again after the coaching audio finishes. Normal pause detection
+and interruptions remain provider-managed outside a timeout.
+
+History saves session text, feedback, source notes and date in localStorage on this
+browser. No audio is recorded. Review, download or delete a session from the history
+list. The list keeps the most recent 50 sessions. Private browsing, cleared site data
+or storage errors can remove or prevent history; download important sessions.
+The FastAPI server still relays data in memory and does not store recordings or notes.
+
+Code map: `core.js` has `answerTimer`, `timeoutInstructions` and `historyStore`.
+The `ASSETS` in `server.py` contain the UI and `app.js` audio/history wiring.
+`test-features.js` tests deadlines, Off mode, local saves, reloads and storage failures.
+Run `node test-core.js && node test-features.js && python3 test_backend.py`.
