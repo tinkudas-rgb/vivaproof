@@ -14,10 +14,15 @@ class Tests(unittest.TestCase):
   s=self.client.get('/app.js').text;self.assertIn("new URL('/voice'",s);self.assertNotIn("fetch('/token')",s)
  def test_features(self):
   ui=self.client.get('/').text
-  for token in ['answer-limit','value="15" selected','history-list','No audio is recorded']:
+  for token in ['pdf-notes','model-panel','maxlength="48000"','answer-limit','value="15" selected','history-list','No audio is recorded']:
    self.assertIn(token,ui)
   self.assertIn('historyStore',self.client.get('/core.js').text)
   self.assertIn('answerTimer',self.client.get('/core.js').text)
+ def test_context_limits(self):
+  import json
+  server.validate_browser_message(json.dumps({'type':'session.update','session':{'system_prompt':'A'*64000}}))
+  with self.assertRaises(ValueError):
+   server.validate_browser_message(json.dumps({'type':'session.update','session':{'system_prompt':'A'*64001}}))
  def test_404(self):self.assertEqual(self.client.get('/missing').status_code,404)
  def test_origin(self):
   with self.assertRaises(Exception):
