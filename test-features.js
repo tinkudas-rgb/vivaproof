@@ -1,0 +1,21 @@
+const assert=require('node:assert/strict'),{answerTimer,timeoutInstructions,historyStore}=require('./core.js');
+let now=0,expired=0,t=answerTimer(15,()=>expired++,()=>now);
+assert(!t.running()); t.start();now=14000;assert.equal(t.remaining(),1);assert(!t.check());
+t.start();now=15000;assert(t.check());assert.equal(expired,1);assert(!t.check());
+now=20000;t.start();t.stop();now=50000;assert(!t.check());
+for(const seconds of [0,-1,1,NaN]){t=answerTimer(seconds,()=>expired++,()=>now);t.start();now+=90000;assert(!t.check());}
+assert.equal(expired,1);
+assert(timeoutInstructions(15).includes('using only source notes'));assert(timeoutInstructions(15).includes('Strength, Gap, Retry tip'));
+const data=new Map(),storage={getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)},h=historyStore(()=>storage);
+assert.deepEqual(h.read().sessions,[]);
+const s={id:'one',date:'2026-10-01T00:00:00Z',mode:'live session',notes:[{id:'N1',text:'Public notes'}],transcript:[{speaker:'you',text:'answer'}],feedback:[]};
+assert(h.save(s).ok);s.transcript[0].text='changed';assert.equal(h.read().sessions[0].transcript[0].text,'answer');
+assert(h.save(s).ok);assert.equal(h.read().sessions.length,1);
+const reload=historyStore(()=>storage);assert.equal(reload.read().sessions[0].id,'one');
+for(let i=0;i<55;i++)h.save({...s,id:String(i)});assert.equal(h.read().sessions.length,50);
+assert(h.remove('54').ok);assert(!h.read().sessions.some(s=>s.id==='54'));
+assert(h.clear().ok);assert.equal(h.read().sessions.length,0);
+data.set('vivaproof.history.v1','broken');assert(!h.read().ok);assert(!h.save(s).ok);
+const blocked=historyStore(()=>{throw Error('disabled')});assert(!blocked.save(s).ok);assert(!blocked.clear().ok);
+const quota=historyStore(()=>({getItem:()=>null,setItem:()=>{throw Error('quota')}}));assert(!quota.save(s).ok);
+console.log('Timer and browser-history tests passed (24 assertions).');
