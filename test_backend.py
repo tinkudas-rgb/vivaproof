@@ -12,6 +12,12 @@ class Tests(unittest.TestCase):
   s=self.client.get('/').text;self.assertNotIn('Powered by',s);self.assertNotIn('Hackathon',s);self.assertIn('Audio and transcripts go to AssemblyAI',s)
  def test_proxy_frontend(self):
   s=self.client.get('/app.js').text;self.assertIn("new URL('/voice'",s);self.assertNotIn("fetch('/token')",s)
+ def test_features(self):
+  ui=self.client.get('/').text
+  for token in ['answer-limit','value="15" selected','history-list','No audio is recorded']:
+   self.assertIn(token,ui)
+  self.assertIn('historyStore',self.client.get('/core.js').text)
+  self.assertIn('answerTimer',self.client.get('/core.js').text)
  def test_404(self):self.assertEqual(self.client.get('/missing').status_code,404)
  def test_origin(self):
   with self.assertRaises(Exception):
